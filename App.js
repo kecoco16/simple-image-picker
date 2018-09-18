@@ -18,8 +18,8 @@ export default class App extends React.Component {
   selectPhotoTapped() {
     const options = {
       quality: 1.0,
-      maxWidth: 500,
-      maxHeight: 500,
+      maxWidth: 800,
+      maxHeight: 800,
       storageOptions: {
         skipBackup: true
       },
@@ -55,7 +55,7 @@ export default class App extends React.Component {
         <TouchableOpacity onPress={this.selectPhotoTapped.bind(this)}>
           <View style={[styles.image, styles.imageContainer]}>
           { this.state.image === null ? <Text>Seleccciona una foto 📷</Text> :
-            <Image style={styles.image} source={this.state.image} />
+            <Image resizeMode='stretch' style={styles.image} source={this.state.image} />
           }
           </View>
         </TouchableOpacity>
