@@ -4,34 +4,59 @@ import {
   Text,
   View,
   TouchableOpacity,
-  Image,
+  Image
 } from 'react-native'
 
 import ImagePicker from 'react-native-image-picker'
+import { DocumentPicker, DocumentPickerUtil } from 'react-native-document-picker'
+import Pdf from 'react-native-pdf'
 import ModalComponent from './components/Modal'
 
 export default class App extends React.Component {
 
   state = {
     image: null,
+    pdf: null,
     modalVisible: false
   }
 
   render() {
+    const { image, pdf, modalVisible } = this.state
     return (
       <View style={styles.container}>
-        <TouchableOpacity onPress={() => this.setModalVisible(!this.state.modalVisible)}>
+        <TouchableOpacity onPress={() => this.setModalVisible(!modalVisible)}>
           <View style={[styles.image, styles.imageContainer]}>
-          { this.state.image === null ? <Text>Seleccciona una foto 📷</Text> :
-            <Image resizeMode='stretch' style={styles.image} source={this.state.image} />
-          }
+
+          { image === null && pdf === null && (
+            <Text>Seleccciona una foto 📷</Text>
+          )}
+
+          { image !== null && pdf === null && (
+            <Image resizeMode='stretch' style={styles.image} source={image} />
+          )}
+          
+          { image === null && pdf !== null && (
+            <Pdf
+              source={pdf}
+              onLoadComplete={(numberOfPages, filePath)=>{
+                  console.log(`number of pages: ${numberOfPages}`)
+              }}
+              onPageChanged={(page, numberOfPages)=>{
+                  console.log(`current page: ${page}`)
+              }}
+              onError={(error)=>{
+                  console.log(error)
+              }}
+              style={styles.image}
+            />
+          )}
           </View>
         </TouchableOpacity>
         <ModalComponent 
-          modalVisible={this.state.modalVisible}
+          modalVisible={modalVisible}
           setModalVisible={this.setModalVisible}
-          photoPicker={this.selectPhotoTapped}
-          pdfPicker={''}
+          photoPicker={this.photoPicker}
+          pdfPicker={this.pdfPicker}
         />
       </View>
     )
@@ -41,9 +66,30 @@ export default class App extends React.Component {
     this.setState({ modalVisible: visible })
   }
 
-  selectPhotoTapped = type => {
+  pdfPicker = () => {
     this.setModalVisible(!this.state.modalVisible)
+    this.setState({ image: null })
 
+    DocumentPicker.show({
+      filetype: [DocumentPickerUtil.pdf()],
+    },(error,res) => {
+      // Android
+      console.log(res)
+      console.log(
+         res.uri,
+         res.type, // mime type
+         res.fileName,
+         res.fileSize
+      )
+      const pdf = { uri: res.uri, cache: true }
+
+      this.setState({ pdf })
+    })
+  }
+
+  photoPicker = type => {
+    this.setModalVisible(!this.state.modalVisible)
+    this.setState({ pdf: null })
     const options = {
       quality: 1.0,
       maxWidth: 800,
