@@ -1,4 +1,4 @@
-# Simple [react-native-image-picker](https://github.com/react-community/react-native-image-picker) example
+# Simple image-picker example
 
 ### Install
 
