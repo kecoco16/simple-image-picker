@@ -39,13 +39,15 @@ export default class App extends React.Component {
             <Pdf
               source={pdf}
               onLoadComplete={(numberOfPages, filePath)=>{
-                  console.log(`number of pages: ${numberOfPages}`)
+                console.log(`file path: ${filePath}`)
+                console.log(`number of pages: ${numberOfPages}`)
               }}
               onPageChanged={(page, numberOfPages)=>{
-                  console.log(`current page: ${page}`)
+                console.log(`current page: ${page}`)
+                console.log(`number of pages page: ${numberOfPages}`)
               }}
               onError={(error)=>{
-                  console.log(error)
+                console.log(error)
               }}
               style={styles.image}
             />
@@ -73,16 +75,12 @@ export default class App extends React.Component {
     DocumentPicker.show({
       filetype: [DocumentPickerUtil.pdf()],
     },(error,res) => {
-      // Android
-      console.log(res)
-      console.log(
-         res.uri,
-         res.type, // mime type
-         res.fileName,
-         res.fileSize
-      )
-      const pdf = { uri: res.uri, cache: true }
+      if (error) {
+        return
+      }
 
+      console.log(res)
+      const pdf = { uri: res.uri, cache: true }
       this.setState({ pdf })
     })
   }
