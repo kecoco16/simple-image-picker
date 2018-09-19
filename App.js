@@ -8,14 +8,42 @@ import {
 } from 'react-native'
 
 import ImagePicker from 'react-native-image-picker'
+import ModalComponent from './components/Modal'
 
 export default class App extends React.Component {
 
   state = {
     image: null,
+    modalVisible: false
   }
 
-  selectPhotoTapped() {
+  render() {
+    return (
+      <View style={styles.container}>
+        <TouchableOpacity onPress={() => this.setModalVisible(!this.state.modalVisible)}>
+          <View style={[styles.image, styles.imageContainer]}>
+          { this.state.image === null ? <Text>Seleccciona una foto 📷</Text> :
+            <Image resizeMode='stretch' style={styles.image} source={this.state.image} />
+          }
+          </View>
+        </TouchableOpacity>
+        <ModalComponent 
+          modalVisible={this.state.modalVisible}
+          setModalVisible={this.setModalVisible}
+          photoPicker={this.selectPhotoTapped}
+          pdfPicker={''}
+        />
+      </View>
+    )
+  }
+
+  setModalVisible = visible => {
+    this.setState({ modalVisible: visible })
+  }
+
+  selectPhotoTapped = type => {
+    this.setModalVisible(!this.state.modalVisible)
+
     const options = {
       quality: 1.0,
       maxWidth: 800,
@@ -29,7 +57,9 @@ export default class App extends React.Component {
       chooseFromLibraryButtonTitle: 'Abrir galeria'
     }
 
-    ImagePicker.showImagePicker(options, (response) => {
+    const selectType = type === 'photo' ? 'launchCamera' : 'launchImageLibrary'
+
+    ImagePicker[selectType](options, (response) => {
       console.log('Response = ', response)
 
       if (response.didCancel) {
@@ -47,20 +77,6 @@ export default class App extends React.Component {
         this.setState({ image })
       }
     })
-  }
-
-  render() {
-    return (
-      <View style={styles.container}>
-        <TouchableOpacity onPress={this.selectPhotoTapped.bind(this)}>
-          <View style={[styles.image, styles.imageContainer]}>
-          { this.state.image === null ? <Text>Seleccciona una foto 📷</Text> :
-            <Image resizeMode='stretch' style={styles.image} source={this.state.image} />
-          }
-          </View>
-        </TouchableOpacity>
-      </View>
-    )
   }
 }
 
